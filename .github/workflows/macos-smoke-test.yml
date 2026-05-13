@@ -35,6 +35,20 @@ jobs:
       - name: Syntax check
         run: bash -n ./taco
 
+      - name: shellcheck (informational for v0.1.0)
+        # shellcheck ships with macos-latest runners via Homebrew already.
+        # continue-on-error so a style nit doesn't block the launch; we'll
+        # tighten to hard-fail in v0.1.1 once we've seen what (if anything)
+        # it flags.
+        continue-on-error: true
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            brew install shellcheck
+          fi
+          shellcheck --version
+          shellcheck -S warning ./taco
+          shellcheck -S warning marketing/scripts/*.sh
+
       - name: taco --help
         run: ./taco --help
 

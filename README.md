@@ -60,6 +60,10 @@ Just a responsible taco.
 - [Contributing](#contributing)
 - [License](#license)
 
+> **Web version**: [tokenwaster76.github.io/laptop_taco](https://tokenwaster76.github.io/laptop_taco) (built from [`docs/`](docs/)).
+> **Watch the demo**: `asciinema play marketing/assets/demo.cast`.
+> **Manpage**: `man taco` after Homebrew install, or `man man/taco.1` from a checkout.
+
 ## Why
 
 - Your laptop wants to sleep. Your agent wants to refactor 47 files. Taco mediates.

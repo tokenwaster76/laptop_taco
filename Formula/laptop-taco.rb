@@ -37,6 +37,7 @@ class LaptopTaco < Formula
 
   def install
     bin.install "taco"
+    man1.install "man/taco.1"
   end
 
   test do

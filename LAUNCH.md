@@ -58,7 +58,18 @@ Upload at https://github.com/settings/profile → *Profile picture → Edit → 
 
 GitHub crops to square automatically, but the SVG is already square so no cropping happens.
 
-### 5. Profile README (renders on your profile page)
+### 5. (Optional) Enable GitHub Pages
+
+The `docs/` folder is configured as a Jekyll site (theme: `jekyll-theme-minimal`). To turn it on:
+
+1. Settings → Pages
+2. Source: `Deploy from a branch`
+3. Branch: `main` · folder: `/docs`
+4. Save
+
+Within ~2 minutes the page goes live at `https://tokenwaster76.github.io/laptop_taco`. It's a stripped-down version of the README, useful when sharing with a non-technical audience (no GitHub chrome).
+
+### 6. Profile README (renders on your profile page)
 
 1. https://github.com/new
 2. Repository name: `tokenwaster76` (exactly your username)
