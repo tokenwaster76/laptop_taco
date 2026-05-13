@@ -9,7 +9,7 @@ VERSION="0.1.0"
 
 print_help() {
   cat <<'EOF'
-🌮 Laptop Taco — for when Claude is cooking and you need to catch a bus.
+🌮 Laptop Taco — for when your agent is cooking and you need to catch a bus.
 
 USAGE
   taco <command...>
@@ -125,7 +125,9 @@ cleanup_caffeinate
 
 end_epoch="$(date +%s)"
 elapsed=$(( end_epoch - start_epoch ))
-if (( elapsed >= 60 )); then
+if (( elapsed >= 3600 )); then
+  runtime="$(( elapsed / 3600 ))h $(( (elapsed % 3600) / 60 ))m $(( elapsed % 60 ))s"
+elif (( elapsed >= 60 )); then
   runtime="$(( elapsed / 60 ))m $(( elapsed % 60 ))s"
 else
   runtime="${elapsed}s"

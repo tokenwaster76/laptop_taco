@@ -8,7 +8,7 @@
 
 <!-- Username is already filled in (tokenwaster76 / laptop_taco). If you fork, replace it. -->
 
-> For when Claude is cooking and you need to catch a bus.
+> For when your agent is cooking and you need to catch a bus.
 
 AI coding agents can take 10, 20, 30 minutes to refactor, test, and argue with your repo. Your Mac, unfortunately, still believes in sleep. So people started carrying half-open laptops around like tiny aluminum tacos.
 
