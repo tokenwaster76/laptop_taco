@@ -156,11 +156,9 @@ cleanup_child() {
   kill_target="${child_kill_target:-$child_pid}"
   if kill -0 "$child_pid" 2>/dev/null; then
     kill -TERM "$kill_target" 2>/dev/null || true
+    sleep 1
     if kill -0 "$child_pid" 2>/dev/null; then
-      sleep 1
-      if kill -0 "$child_pid" 2>/dev/null; then
-        kill -KILL "$kill_target" 2>/dev/null || true
-      fi
+      kill -KILL "$kill_target" 2>/dev/null || true
     fi
   fi
   wait "$child_pid" 2>/dev/null || true
@@ -219,7 +217,6 @@ echo
 
 wait "$child_pid"
 child_exit=$?
-child_pid=""
 
 cleanup_caffeinate
 
