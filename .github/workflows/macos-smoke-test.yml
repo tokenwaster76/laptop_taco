@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   # Opt JavaScript actions into Node 24 now (v20 is deprecated; the forced
   # switch lands June 2nd, 2026). See:
