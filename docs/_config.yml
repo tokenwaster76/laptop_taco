@@ -1,0 +1,8 @@
+title: Laptop Taco 🌮
+description: For when your agent is cooking and you need to catch a bus.
+url: https://tokenwaster76.github.io
+baseurl: /laptop_taco
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-relative-links
+# Pages serves docs/ as the site root.  index.md below is the home page.

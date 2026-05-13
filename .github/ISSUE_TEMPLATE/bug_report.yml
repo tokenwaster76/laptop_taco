@@ -1,0 +1,56 @@
+name: Bug report
+description: Something in taco does not behave the way the README says it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. The whole script is ~210 lines, so most bugs are reproducible in a couple of minutes — please include the output of `taco doctor` so we can see your environment.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: One short paragraph. What command did you run, what did you expect, what did you see?
+      placeholder: |
+        I ran `./taco "npm test"` expecting it to keep the Mac awake for the duration. After about 8 minutes the display slept anyway.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Repro steps
+      description: The exact commands. Copy-paste from your terminal.
+      render: bash
+      placeholder: |
+        $ git clone https://github.com/tokenwaster76/laptop_taco
+        $ cd laptop_taco
+        $ chmod +x taco
+        $ ./taco "sleep 600"
+        # ... display slept around 8 minutes in
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `./taco doctor`
+      description: Paste the full output. Helps me see your macOS version, Bash version, battery, and tool availability.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: taco-version
+    attributes:
+      label: taco version (`./taco --version`)
+      placeholder: taco 0.1.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else?
+      description: Logs, screenshots, suspicions, theories. Optional.

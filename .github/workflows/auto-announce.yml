@@ -1,0 +1,158 @@
+name: Auto-announce
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Opt JavaScript actions into Node 24 now (v20 deprecated; forced switch
+  # June 2nd, 2026).
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  prereq:
+    name: Check which channels are configured
+    runs-on: ubuntu-latest
+    outputs:
+      has_mastodon: ${{ steps.flags.outputs.has_mastodon }}
+      has_bluesky: ${{ steps.flags.outputs.has_bluesky }}
+      has_linkedin: ${{ steps.flags.outputs.has_linkedin }}
+      has_threads: ${{ steps.flags.outputs.has_threads }}
+      has_x: ${{ steps.flags.outputs.has_x }}
+      has_devto: ${{ steps.flags.outputs.has_devto }}
+      has_hashnode: ${{ steps.flags.outputs.has_hashnode }}
+      has_discord: ${{ steps.flags.outputs.has_discord }}
+      has_slack: ${{ steps.flags.outputs.has_slack }}
+      reddit_opt_in: ${{ steps.flags.outputs.reddit_opt_in }}
+    steps:
+      - id: flags
+        env:
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_API_TOKEN: ${{ secrets.HASHNODE_API_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REDDIT_OPT_IN: ${{ vars.REDDIT_AUTO_POST_OPT_IN }}
+        run: |
+          set -e
+          emit() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
+          [ -n "$MASTODON_ACCESS_TOKEN" ] && emit has_mastodon true || emit has_mastodon false
+          [ -n "$BLUESKY_APP_PASSWORD" ] && emit has_bluesky true || emit has_bluesky false
+          [ -n "$LINKEDIN_ACCESS_TOKEN" ] && emit has_linkedin true || emit has_linkedin false
+          [ -n "$THREADS_ACCESS_TOKEN" ] && emit has_threads true || emit has_threads false
+          [ -n "$X_API_KEY" ] && emit has_x true || emit has_x false
+          [ -n "$DEVTO_API_KEY" ] && emit has_devto true || emit has_devto false
+          [ -n "$HASHNODE_API_TOKEN" ] && emit has_hashnode true || emit has_hashnode false
+          [ -n "$DISCORD_WEBHOOK_URL" ] && emit has_discord true || emit has_discord false
+          [ -n "$SLACK_WEBHOOK_URL" ] && emit has_slack true || emit has_slack false
+          [ "$REDDIT_OPT_IN" = "true" ] && emit reddit_opt_in true || emit reddit_opt_in false
+
+  announce:
+    name: Fan out to configured channels
+    needs: prereq
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x marketing/scripts/*.sh
+
+      - name: Mastodon
+        if: needs.prereq.outputs.has_mastodon == 'true'
+        env:
+          MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+        run: marketing/scripts/post-mastodon.sh || echo "mastodon soft-fail"
+
+      - name: Bluesky
+        if: needs.prereq.outputs.has_bluesky == 'true'
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: marketing/scripts/post-bluesky.sh || echo "bluesky soft-fail"
+
+      - name: LinkedIn
+        if: needs.prereq.outputs.has_linkedin == 'true'
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_AUTHOR_URN: ${{ secrets.LINKEDIN_AUTHOR_URN }}
+        run: marketing/scripts/post-linkedin.sh || echo "linkedin soft-fail"
+
+      - name: Threads
+        if: needs.prereq.outputs.has_threads == 'true'
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+        run: marketing/scripts/post-threads.sh || echo "threads soft-fail"
+
+      - name: X / Twitter
+        if: needs.prereq.outputs.has_x == 'true'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          python3 -m pip install --user --quiet requests-oauthlib
+          marketing/scripts/post-x.sh || echo "x soft-fail"
+
+      - name: DEV.to draft
+        if: needs.prereq.outputs.has_devto == 'true'
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: marketing/scripts/create-devto-draft.sh || echo "devto soft-fail"
+
+      - name: Hashnode draft
+        if: needs.prereq.outputs.has_hashnode == 'true'
+        env:
+          HASHNODE_API_TOKEN: ${{ secrets.HASHNODE_API_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: marketing/scripts/create-hashnode-draft.sh || echo "hashnode soft-fail"
+
+      - name: Discord webhook
+        if: needs.prereq.outputs.has_discord == 'true'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: marketing/scripts/post-discord.sh || echo "discord soft-fail"
+
+      - name: Slack webhook
+        if: needs.prereq.outputs.has_slack == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: marketing/scripts/post-slack.sh || echo "slack soft-fail"
+
+      # Reddit is hard-gated. Only fires if the maintainer flipped the repo
+      # variable REDDIT_AUTO_POST_OPT_IN=true AND set REDDIT_SUBREDDIT.
+      - name: Reddit (one sub, opt-in)
+        if: needs.prereq.outputs.reddit_opt_in == 'true'
+        env:
+          REDDIT_AUTO_POST_OPT_IN: 'true'
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          REDDIT_SUBREDDIT: ${{ vars.REDDIT_SUBREDDIT }}
+        run: marketing/scripts/post-reddit.sh || echo "reddit soft-fail"
+
+      - name: Archive on Wayback Machine
+        env:
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: marketing/scripts/archive-wayback.sh || echo "wayback soft-fail"
+
+      - name: Sync repo description + topics
+        env:
+          GITHUB_TOKEN: ${{ secrets.LAUNCH_GH_TOKEN }}
+        run: |
+          if [ -n "$GITHUB_TOKEN" ]; then
+            marketing/scripts/set-repo-metadata.sh || echo "metadata soft-fail"
+          else
+            echo "set-repo-metadata: LAUNCH_GH_TOKEN not set, skipping"
+          fi

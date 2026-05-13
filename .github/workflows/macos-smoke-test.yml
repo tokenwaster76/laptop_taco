@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
 
+env:
+  # Opt JavaScript actions into Node 24 now (v20 is deprecated; the forced
+  # switch lands June 2nd, 2026). See:
+  # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   smoke:
     name: taco on macos-latest
@@ -29,6 +35,20 @@ jobs:
       - name: Syntax check
         run: bash -n ./taco
 
+      - name: shellcheck (informational for v0.1.0)
+        # shellcheck ships with macos-latest runners via Homebrew already.
+        # continue-on-error so a style nit doesn't block the launch; we'll
+        # tighten to hard-fail in v0.1.1 once we've seen what (if anything)
+        # it flags.
+        continue-on-error: true
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            brew install shellcheck
+          fi
+          shellcheck --version
+          shellcheck -S warning ./taco
+          shellcheck -S warning marketing/scripts/*.sh
+
       - name: taco --help
         run: ./taco --help
 
@@ -38,16 +58,43 @@ jobs:
           echo "$out"
           test "$out" = "taco 0.1.0"
 
+      - name: taco doctor (should exit 0 on macos-latest)
+        run: ./taco doctor
+
+      - name: Help text mentions doctor
+        run: ./taco --help | grep -q "taco doctor"
+
       - name: Happy path
         run: ./taco "echo cooking && sleep 1 && echo done"
 
-      - name: Exit code propagation
+      - name: Exit code propagation (42)
         run: |
           set +e
           ./taco "exit 42"
           code=$?
           echo "Exit code: $code"
           test "$code" -eq 42
+
+      - name: Exit code propagation (127, command not found)
+        run: |
+          set +e
+          ./taco "this-binary-definitely-does-not-exist"
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 127
+
+      - name: Shell features (pipes + &&)
+        run: ./taco "echo a | tr a-z A-Z && echo done"
+
+      - name: Quoted args with embedded single quotes
+        run: ./taco "echo \"taco's lid\""
+
+      - name: Missing-command guard exits 1
+        run: |
+          set +e
+          ./taco
+          code=$?
+          test "$code" -eq 1
 
       # v0.1.0: the Ctrl+C trap is verified manually. CI does not give us a
       # reliable TTY to deliver SIGINT to the foreground process group the way

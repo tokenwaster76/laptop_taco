@@ -1,0 +1,45 @@
+name: Feature request
+description: An idea that fits the "tiny + funny + useful" shape.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Laptop Taco stays small on purpose. Read `CONTRIBUTING.md` before filing — features that need a config file, a daemon, or a Rust rewrite will be politely declined.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation where the current `taco` falls short.
+      placeholder: |
+        When I quit taco with Ctrl+C, `npm test` keeps running in the background as an orphaned process.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What's the smallest change that would fix it?
+      description: Specific. Pretend you're writing the diff. Bonus points for a one-line patch.
+      placeholder: |
+        Spawn the wrapped command with `setsid` (or `kill -- -$pid`) so SIGTERM cascades to the whole process group.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you think of, and why did you reject it?
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Size estimate
+      options:
+        - "Less than 20 lines of Bash"
+        - "20–60 lines, single concept"
+        - "More than 60 lines (probably needs a smaller version first)"
+    validations:
+      required: true

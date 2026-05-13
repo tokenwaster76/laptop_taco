@@ -9,11 +9,12 @@ VERSION="0.1.0"
 
 print_help() {
   cat <<'EOF'
-🌮 Laptop Taco — for when Claude is cooking and you need to catch a bus.
+🌮 Laptop Taco — for when your agent is cooking and you need to catch a bus.
 
 USAGE
   taco <command...>
   taco "<quoted command with shell features>"
+  taco doctor
   taco --help | --version
 
 EXAMPLES
@@ -22,11 +23,14 @@ EXAMPLES
   taco opencode
   taco "npm test"
   taco "echo cooking && sleep 3 && echo done"
+  taco doctor
 
 WHAT IT DOES
   Wraps your command in macOS caffeinate so the system stays awake
   while it runs. Prints PID and battery. Notifies when it's done.
   Returns the same exit code as the wrapped command.
+
+  Run 'taco doctor' to verify your macOS setup is wired up correctly.
 
 SAFETY
   Do not put a hot running laptop in a backpack. Seriously.
@@ -44,6 +48,62 @@ fi
 if [[ "${1:-}" == "--version" || "${1:-}" == "-v" ]]; then
   echo "taco ${VERSION}"
   exit 0
+fi
+
+run_doctor() {
+  local fail=0 warn=0 tool raw
+  echo "🌮 Laptop Taco ${VERSION} — doctor"
+  echo
+  echo "Platform:    $(uname -srm)"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo "macOS:       $(sw_vers -productVersion 2>/dev/null || echo unknown)"
+  else
+    echo "✗ Not Darwin — taco will not run on this platform"
+    fail=$((fail + 1))
+  fi
+  echo "Bash:        ${BASH_VERSION}"
+  echo
+  for tool in /usr/bin/caffeinate /usr/bin/pmset /usr/bin/osascript; do
+    if [[ -x "$tool" ]]; then
+      echo "✓ ${tool}"
+    else
+      echo "✗ ${tool}  (missing)"
+      fail=$((fail + 1))
+    fi
+  done
+  echo
+  if command -v pmset >/dev/null 2>&1; then
+    raw="$(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%' | head -1 || true)"
+    raw="${raw%\%}"
+    if [[ "$raw" =~ ^[0-9]+$ ]]; then
+      echo "Battery:     ${raw}%"
+      if (( raw < 20 )); then
+        echo "⚠ Battery below 20% — plug in before long runs."
+        warn=$((warn + 1))
+      fi
+    else
+      echo "Battery:     no battery reported (desktop Mac?)"
+    fi
+  fi
+  echo
+  echo "Notifications: cannot verify without firing one. Try:  ./taco \"sleep 1\""
+  echo "If no banner appears, check System Settings → Notifications."
+  echo
+  if (( fail > 0 )); then
+    echo "Verdict: ${fail} blocker(s) — fix before running taco"
+    return 1
+  fi
+  if (( warn > 0 )); then
+    echo "Verdict: ready (${warn} warning(s))"
+  else
+    echo "Verdict: ready"
+  fi
+  return 0
+}
+
+if [[ "${1:-}" == "doctor" ]]; then
+  run_doctor
+  exit $?
 fi
 
 if [[ "$(uname)" != "Darwin" ]]; then
@@ -125,7 +185,9 @@ cleanup_caffeinate
 
 end_epoch="$(date +%s)"
 elapsed=$(( end_epoch - start_epoch ))
-if (( elapsed >= 60 )); then
+if (( elapsed >= 3600 )); then
+  runtime="$(( elapsed / 3600 ))h $(( (elapsed % 3600) / 60 ))m $(( elapsed % 60 ))s"
+elif (( elapsed >= 60 )); then
   runtime="$(( elapsed / 60 ))m $(( elapsed % 60 ))s"
 else
   runtime="${elapsed}s"
