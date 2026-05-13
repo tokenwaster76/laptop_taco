@@ -5,7 +5,8 @@
 # whichever automated posters you haven't configured yet.
 #
 # On macOS, every URL is opened in your default browser via `open`.
-# On other platforms, the URLs are printed so you can paste them.
+# On Linux, uses `xdg-open` if available (Arch: pacman -S xdg-utils).
+# Otherwise the URLs are printed so you can paste them by hand.
 
 set -euo pipefail
 
@@ -49,15 +50,26 @@ extras=("$REPO_URL")
 
 all_urls=("${no_api_urls[@]}" "${fallback_urls[@]}" "${extras[@]}")
 
+# Pick a URL opener for the current platform.
+opener=""
 if [[ "$(uname)" == "Darwin" ]]; then
+  opener="open"
+elif command -v xdg-open >/dev/null 2>&1; then
+  opener="xdg-open"
+fi
+
+if [[ -n "$opener" ]]; then
   for u in "${all_urls[@]}"; do
-    open "$u" || true
+    "$opener" "$u" >/dev/null 2>&1 &
   done
-  echo "Opened ${#all_urls[@]} tabs."
-  echo "First four are submit forms (HN / Lobsters / Product Hunt / Indie Hackers)."
-  echo "Next five are share-intent fallbacks (X / Bluesky / LinkedIn / Threads / Mastodon)."
+  wait 2>/dev/null || true
+  echo "Opened ${#all_urls[@]} tabs via '$opener'."
+  echo "  First four:  submit forms (HN / Lobsters / Product Hunt / Indie Hackers)"
+  echo "  Next five:   share-intent fallbacks (X / Bluesky / LinkedIn / Threads / Mastodon)"
+  echo "  Last:        the repo itself"
 else
-  echo "Not macOS — printing URLs instead. Paste into your browser."
+  echo "No browser opener available (need 'open' on macOS or 'xdg-open' on Linux)."
+  echo "Printing URLs instead. Paste into your browser."
   echo
   echo "## Submit forms (no API — manual click)"
   for u in "${no_api_urls[@]}"; do
