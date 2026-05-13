@@ -41,6 +41,9 @@ jobs:
       - name: taco --version
         run: ./taco --version
 
+      - name: taco doctor
+        run: ./taco doctor
+
       - name: Happy path
         run: ./taco "echo cooking && sleep 1 && echo done"
 
@@ -51,3 +54,42 @@ jobs:
           code=$?
           echo "Exit code: $code"
           test "$code" -eq 42
+
+      - name: Exit code propagation (127 for missing inner command)
+        run: |
+          set +e
+          ./taco "__taco_missing_inner_cmd_127__"
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 127
+
+      - name: Missing command guard (no args)
+        run: |
+          set +e
+          output="$(./taco 2>&1)"
+          code=$?
+          echo "$output"
+          test "$code" -eq 1
+          echo "$output" | grep -F "No command given. Try: taco claude"
+          echo "$output" | grep -F "See: taco --help"
+
+      - name: Shell features (env + pipe + &&)
+        run: |
+          ./taco 'FOO=beans && echo "$FOO" | grep -Fx beans'
+
+      - name: Embedded quotes
+        run: |
+          ./taco 'printf "%s\n" "inner \"quote\" ok" | grep -Fx "inner \"quote\" ok"'
+
+      - name: Interrupt handling exits 130
+        run: |
+          set +e
+          ./taco "sleep 30" >/tmp/taco-interrupt.log 2>&1 &
+          taco_pid=$!
+          sleep 2
+          kill -INT "$taco_pid"
+          wait "$taco_pid"
+          code=$?
+          echo "Exit code: $code"
+          tail -n 40 /tmp/taco-interrupt.log
+          test "$code" -eq 130
