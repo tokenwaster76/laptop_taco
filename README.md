@@ -39,7 +39,7 @@ It is 2026. People are wandering through coffee shops clutching half-open MacBoo
 
 I refused to participate in this lid-ajar nightmare.
 
-**Laptop Taco** is one Bash script that wraps your long-running command with macOS `caffeinate`, prints PID + battery + runtime, warns on low battery, and pings you when the agent is done cooking. Same exit code as your command. macOS-only on purpose. ~150 lines. MIT. No app. No account. No cloud. No subscription. No newsletter. No telemetry. No auto-updater.
+**Laptop Taco** is one Bash script that wraps your long-running command with macOS `caffeinate`, prints PID + battery + runtime, warns on low battery, and pings you when the agent is done cooking. Same exit code as your command. macOS-only on purpose. ~210 lines. MIT. No app. No account. No cloud. No subscription. No newsletter. No telemetry. No auto-updater.
 
 Just a responsible taco.
 
@@ -147,7 +147,7 @@ It is deliberately small. The whole pipeline is:
 3. **Argument capture.** All args are joined into one command string, then handed to `/bin/bash -lc "$command"` so pipes, `&&`, env vars, and aliases all work.
 4. **Background launch + caffeinate.** Your command runs in the background; its PID is captured. Then `/usr/bin/caffeinate -dim -w <pid>` starts in the background and exits automatically when the child dies.
 5. **Battery readout.** `pmset -g batt` is best-effort. If parseable, the script prints the percentage and warns if it's under 20%. If unparseable (desktop Mac, parser change), the line is omitted silently.
-6. **Signal handling.** `trap on_interrupt INT TERM` kills the child cleanly, cleans up `caffeinate`, waits, and exits 130 on Ctrl+C.
+6. **Signal handling.** `trap on_interrupt INT TERM HUP` kills the child cleanly, cleans up `caffeinate`, waits, and exits 130 on Ctrl+C or terminal close.
 7. **Exit-code propagation.** `set -u` + `set -o pipefail`, but no `set -e` — because the whole point is to capture the child's exit code from `wait` and pass it through verbatim.
 8. **Notification.** `osascript -e 'display notification ...'` fires on completion. Notification failure never fails the run.
 9. **Runtime formatting.** `7s`, `23m 18s`, or `2h 7m 5s`, because the killer use case is multi-hour agent runs and `127m 5s` looks dumb.
@@ -186,7 +186,7 @@ Yes — and any other CLI agent. Just `./taco <bin>` (or `./taco "<bin> --flags 
 Because `caffeinate` is the whole dependency, and there's no honest equivalent on Linux or Windows that does the same thing the same way. `systemd-inhibit`, `xset s off`, and `caffeine` all behave differently. Pretending one wrapper handles all three would be dishonest portability.
 
 **Why Bash, not Go / Rust / Python?**
-Half the value is that you can read all of it in one sitting. ~150 lines of Bash that you can audit before you `chmod +x` is a feature, not a limitation.
+Half the value is that you can read all of it in one sitting. ~210 lines of Bash that you can audit before you `chmod +x` is a feature, not a limitation.
 
 **Does it work with the lid closed?**
 No. Apple's lid-close sleep is its own beast and `caffeinate -dim` does not override it. If you close the lid, the Mac is going to sleep regardless. Do not put a hot laptop in a backpack.
@@ -249,7 +249,6 @@ See [.github/workflows/macos-smoke-test.yml](.github/workflows/macos-smoke-test.
 
 ## Roadmap
 
-- `taco doctor` — diagnose `caffeinate`, `pmset`, `osascript`, notification permission
 - `taco status` — show whether a previous taco is still running
 - `taco tmux <command>` — wrap inside a detached tmux session
 - Homebrew tap + formula
