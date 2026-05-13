@@ -57,13 +57,11 @@ Just a responsible taco.
 - [Safety](#safety)
 - [GitHub Actions smoke test](#github-actions-smoke-test)
 - [Roadmap](#roadmap)
-- [Share](#share)
 - [Star history](#star-history)
 - [Contributing](#contributing)
 - [License](#license)
 
 > **Web version**: [tokenwaster76.github.io/laptop_taco](https://tokenwaster76.github.io/laptop_taco) (built from [`docs/`](docs/)).
-> **Watch the demo**: `asciinema play marketing/assets/demo.cast`.
 > **Manpage**: `man taco` after Homebrew install, or `man man/taco.1` from a checkout.
 
 ## Why
@@ -109,8 +107,6 @@ Anything you pass gets handed to `bash -lc`, so pipes, `&&`, env vars, and alias
 Exit code is whatever your command returned. `./taco "exit 42"` exits 42.
 
 ## Demo
-
-![Laptop Taco terminal demo](marketing/assets/terminal-screenshot.svg)
 
 ```
 🌮 Laptop Taco engaged
@@ -257,34 +253,6 @@ See [.github/workflows/macos-smoke-test.yml](.github/workflows/macos-smoke-test.
 - Optional sound effects (a tiny `say done` is tempting)
 - Taco ASCII art quality improvements
 - Panic mode for when the agent starts editing auth files
-
-## Share
-
-If this made you laugh or saved your agent run, throw it at someone whose hinge you might be saving:
-
-```text
-People are walking around with half-open laptops so AI coding agents do not fall asleep mid-task.
-
-So I made Laptop Taco 🌮
-
-No app. No account. No cloud. Just a responsible taco.
-
-https://github.com/tokenwaster76/laptop_taco
-```
-
-One-click compose (pre-fills the text):
-
-- [Share on X / Twitter](https://twitter.com/intent/tweet?text=People%20are%20walking%20around%20with%20half-open%20laptops%20so%20AI%20coding%20agents%20don%27t%20fall%20asleep%20mid-task.%20So%20I%20made%20Laptop%20Taco%20%F0%9F%8C%AE%20%E2%80%94%20a%20tiny%20macOS%20CLI%20for%20long-running%20agents.%20https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco)
-- [Share on Bluesky](https://bsky.app/intent/compose?text=People%20are%20walking%20around%20with%20half-open%20laptops%20so%20AI%20coding%20agents%20don%27t%20fall%20asleep%20mid-task.%20So%20I%20made%20Laptop%20Taco%20%F0%9F%8C%AE%20%E2%80%94%20a%20tiny%20macOS%20CLI.%20https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco)
-- [Share on LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco)
-- [Share on Threads](https://threads.net/intent/post?text=People%20are%20walking%20around%20with%20half-open%20laptops%20so%20AI%20coding%20agents%20don%27t%20fall%20asleep%20mid-task.%20So%20I%20made%20Laptop%20Taco%20%F0%9F%8C%AE.%20https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco)
-- [Share on Mastodon (via toot.kytta.dev)](https://toot.kytta.dev/?text=People%20are%20walking%20around%20with%20half-open%20laptops%20so%20AI%20coding%20agents%20don%27t%20fall%20asleep%20mid-task.%20So%20I%20made%20Laptop%20Taco%20%F0%9F%8C%AE%20%E2%80%94%20a%20tiny%20macOS%20CLI.%20https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco)
-- [Submit to Hacker News](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco&t=Show%20HN%3A%20Laptop%20Taco%20%E2%80%93%20keep%20your%20Mac%20awake%20while%20coding%20agents%20run)
-- [Submit to Lobsters](https://lobste.rs/stories/new?title=Laptop%20Taco%3A%20a%20tiny%20macOS%20caffeinate%20wrapper%20for%20long-running%20coding%20agents&url=https%3A%2F%2Fgithub.com%2Ftokenwaster76%2Flaptop_taco&tags=release%2Cunix%2Cmac%2Cshow)
-
-Social preview image: see [`marketing/assets/social-preview.svg`](marketing/assets/social-preview.svg). Convert to PNG before uploading via *Repo Settings → Social preview*.
-
-Full launch kit (post drafts, API posters, automation workflows): [`marketing/`](marketing/).
 
 ## Star history
 
