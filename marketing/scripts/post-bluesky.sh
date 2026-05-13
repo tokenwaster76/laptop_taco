@@ -37,7 +37,7 @@ print(json.dumps({"identifier": os.environ["HANDLE"], "password": os.environ["PA
 PY
 )
 
-session=$(curl -fsS -X POST https://bsky.social/xrpc/com.atproto.server.createSession \
+session=$(curl -fsS --max-time 60 -X POST https://bsky.social/xrpc/com.atproto.server.createSession \
   -H "Content-Type: application/json" \
   -d "$session_payload")
 
@@ -67,7 +67,7 @@ print(json.dumps({
 PY
 )
 
-resp=$(curl -fsS -X POST https://bsky.social/xrpc/com.atproto.repo.createRecord \
+resp=$(curl -fsS --max-time 60 -X POST https://bsky.social/xrpc/com.atproto.repo.createRecord \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $jwt" \
   -d "$post_payload")

@@ -45,7 +45,7 @@ if [[ -z "$code" ]]; then
   exit 1
 fi
 
-resp=$(curl -fsS -X POST https://www.linkedin.com/oauth/v2/accessToken \
+resp=$(curl -fsS --max-time 60 -X POST https://www.linkedin.com/oauth/v2/accessToken \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "grant_type=authorization_code" \
   --data-urlencode "code=$code" \
@@ -63,7 +63,7 @@ if [[ -z "$access_token" ]]; then
 fi
 
 # Fetch the author URN via userinfo (OpenID).
-info=$(curl -fsS https://api.linkedin.com/v2/userinfo \
+info=$(curl -fsS --max-time 60 https://api.linkedin.com/v2/userinfo \
   -H "Authorization: Bearer $access_token")
 sub=$(printf '%s' "$info" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("sub",""))')
 

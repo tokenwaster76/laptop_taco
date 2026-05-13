@@ -31,7 +31,7 @@ content=$(sed "s|<REPO_URL>|$REPO_URL|g" "$src")
 
 payload=$(CONTENT="$content" python3 -c 'import os,json;print(json.dumps({"content": os.environ["CONTENT"]}))')
 
-curl -fsS -X POST "$DISCORD_WEBHOOK_URL" \
+curl -fsS --max-time 60 -X POST "$DISCORD_WEBHOOK_URL" \
   -H "Content-Type: application/json" \
   -d "$payload" >/dev/null
 

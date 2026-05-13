@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Laptop Taco profile avatar — a stylized taco on a dark canvas with the project's amber accent.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Laptop Taco profile avatar.">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0e0e10"/>
       <stop offset="100%" stop-color="#1a1a20"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.55" r="0.45">
-      <stop offset="0%" stop-color="#f5a623" stop-opacity="0.22"/>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
+      <stop offset="0%" stop-color="#f5a623" stop-opacity="0.30"/>
+      <stop offset="60%" stop-color="#f5a623" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#f5a623" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="shellOuter" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#f5c98c"/>
-      <stop offset="100%" stop-color="#c98c4a"/>
+      <stop offset="100%" stop-color="#b87a35"/>
     </linearGradient>
     <linearGradient id="shellInner" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#e1a865"/>
-      <stop offset="100%" stop-color="#a76e2d"/>
+      <stop offset="100%" stop-color="#8f5a1f"/>
     </linearGradient>
     <linearGradient id="lettuce" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#a4cf6b"/>
+      <stop offset="0%" stop-color="#b4d877"/>
       <stop offset="100%" stop-color="#6a9b3f"/>
     </linearGradient>
   </defs>
@@ -26,48 +27,49 @@
   <!-- Background -->
   <rect width="1024" height="1024" fill="url(#bg)"/>
 
-  <!-- Subtle amber glow behind the taco -->
-  <circle cx="512" cy="560" r="430" fill="url(#glow)"/>
+  <!-- Glow behind the taco -->
+  <circle cx="512" cy="512" r="500" fill="url(#glow)"/>
 
   <!-- Amber ring -->
-  <circle cx="512" cy="512" r="496" fill="none" stroke="#f5a623" stroke-opacity="0.32" stroke-width="4"/>
+  <circle cx="512" cy="512" r="498" fill="none" stroke="#f5a623" stroke-opacity="0.42" stroke-width="6"/>
 
-  <!-- Taco illustration -->
-  <g transform="translate(512 560)">
-    <!-- Outer shell (folded tortilla, half-pill) -->
-    <path d="M -300 -40 Q -300 240 0 240 Q 300 240 300 -40 Z"
-          fill="url(#shellOuter)" stroke="#7c4a18" stroke-width="6"/>
+  <!-- Taco — large, perfectly centered. Scale-up of the original geometry,
+       sized so the bounding box (≈ 920 wide × 600 tall) reads cleanly even
+       at 100×100 avatar sizes. -->
+  <g transform="translate(512 540)">
+    <!-- Outer shell (folded tortilla) -->
+    <path d="M -460 -60 Q -460 360 0 360 Q 460 360 460 -60 Z"
+          fill="url(#shellOuter)" stroke="#6b3d12" stroke-width="10"/>
     <!-- Inner shadow rim -->
-    <path d="M -276 -22 Q -276 220 0 220 Q 276 220 276 -22 Z"
+    <path d="M -420 -32 Q -420 330 0 330 Q 420 330 420 -32 Z"
           fill="url(#shellInner)"/>
-    <!-- Tortilla highlight -->
-    <path d="M -260 -10 Q -260 -32 -180 -34 L 180 -34 Q 260 -32 260 -10"
-          fill="none" stroke="#f7d49b" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+    <!-- Tortilla highlight along the rim -->
+    <path d="M -390 -18 Q -390 -48 -280 -52 L 280 -52 Q 390 -48 390 -18"
+          fill="none" stroke="#fbe1ab" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
 
-    <!-- Lettuce mound -->
-    <path d="M -260 -28
-             Q -240 -90 -180 -65
-             Q -120 -110 -60 -78
-             Q -10 -120 60 -82
-             Q 120 -118 180 -72
-             Q 240 -100 260 -28 Z"
-          fill="url(#lettuce)" stroke="#3f6a25" stroke-width="4" stroke-linejoin="round"/>
-    <!-- Lettuce highlight -->
-    <path d="M -200 -52 Q -150 -68 -100 -58 M -40 -72 Q 0 -90 60 -68 M 120 -76 Q 170 -84 210 -58"
-          fill="none" stroke="#c2e29c" stroke-width="5" stroke-linecap="round" opacity="0.75"/>
+    <!-- Lettuce mound (scalloped curve) -->
+    <path d="M -400 -40
+             Q -370 -130 -280 -98
+             Q -190 -160 -100 -118
+             Q -10 -180 90 -124
+             Q 190 -170 280 -110
+             Q 370 -150 400 -40 Z"
+          fill="url(#lettuce)" stroke="#3f6a25" stroke-width="7" stroke-linejoin="round"/>
+    <!-- Lettuce highlight strokes -->
+    <path d="M -310 -80 Q -240 -100 -160 -88
+             M -60 -108 Q 10 -136 90 -106
+             M 180 -118 Q 250 -128 310 -90"
+          fill="none" stroke="#d6ebab" stroke-width="8" stroke-linecap="round" opacity="0.75"/>
 
-    <!-- Tomato / salsa cubes -->
-    <rect x="-176" y="-46" width="32" height="32" rx="6" fill="#e53935" stroke="#9b1c1c" stroke-width="3" transform="rotate(-8 -160 -30)"/>
-    <rect x="-60" y="-54" width="30" height="30" rx="6" fill="#ef5350" stroke="#9b1c1c" stroke-width="3" transform="rotate(12 -45 -39)"/>
-    <rect x="58" y="-46" width="34" height="34" rx="6" fill="#e53935" stroke="#9b1c1c" stroke-width="3" transform="rotate(-4 75 -29)"/>
-    <rect x="146" y="-50" width="30" height="30" rx="6" fill="#ef5350" stroke="#9b1c1c" stroke-width="3" transform="rotate(18 161 -35)"/>
+    <!-- Tomato cubes -->
+    <rect x="-270" y="-72" width="48" height="48" rx="9" fill="#e53935" stroke="#9b1c1c" stroke-width="5" transform="rotate(-8 -246 -48)"/>
+    <rect x="-100" y="-82" width="44" height="44" rx="9" fill="#ef5350" stroke="#9b1c1c" stroke-width="5" transform="rotate(12 -78 -60)"/>
+    <rect x="80" y="-70" width="50" height="50" rx="9" fill="#e53935" stroke="#9b1c1c" stroke-width="5" transform="rotate(-4 105 -45)"/>
+    <rect x="220" y="-78" width="44" height="44" rx="9" fill="#ef5350" stroke="#9b1c1c" stroke-width="5" transform="rotate(18 242 -56)"/>
 
     <!-- Cheese shreds -->
-    <rect x="-130" y="-66" width="64" height="10" rx="5" fill="#fdd835" stroke="#a98714" stroke-width="2.5" transform="rotate(-6 -98 -61)"/>
-    <rect x="10" y="-72" width="70" height="10" rx="5" fill="#ffeb3b" stroke="#a98714" stroke-width="2.5" transform="rotate(4 45 -67)"/>
-    <rect x="80" y="-90" width="46" height="9" rx="4.5" fill="#fdd835" stroke="#a98714" stroke-width="2.5" transform="rotate(-12 103 -85)"/>
+    <rect x="-200" y="-100" width="98" height="15" rx="7" fill="#fdd835" stroke="#a98714" stroke-width="4" transform="rotate(-6 -151 -92)"/>
+    <rect x="20" y="-110" width="108" height="15" rx="7" fill="#ffeb3b" stroke="#a98714" stroke-width="4" transform="rotate(4 74 -102)"/>
+    <rect x="120" y="-138" width="72" height="14" rx="6" fill="#fdd835" stroke="#a98714" stroke-width="4" transform="rotate(-12 156 -131)"/>
   </g>
-
-  <!-- Wordmark — small, lower-right -->
-  <text x="952" y="990" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="34" font-weight="600" fill="#f5a623" text-anchor="end" opacity="0.88">taco</text>
 </svg>

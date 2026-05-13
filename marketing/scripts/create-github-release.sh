@@ -38,7 +38,7 @@ body=$(sed "s|<REPO_URL>|$REPO_URL|g" "$body_file")
 api="https://api.github.com/repos/$OWNER/$REPO/releases"
 
 # Idempotency: check whether a release for this tag already exists.
-existing=$(curl -fsS \
+existing=$(curl -fsS --max-time 60 \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   "$api/tags/$TAG" 2>/dev/null || true)
@@ -67,7 +67,7 @@ print(json.dumps({
 PY
 )
 
-resp=$(curl -fsS -X POST "$api" \
+resp=$(curl -fsS --max-time 60 -X POST "$api" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   -d "$payload")

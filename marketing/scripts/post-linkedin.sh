@@ -57,7 +57,7 @@ print(json.dumps({
 PY
 )
 
-resp=$(curl -fsS -X POST https://api.linkedin.com/v2/ugcPosts \
+resp=$(curl -fsS --max-time 60 -X POST https://api.linkedin.com/v2/ugcPosts \
   -H "Authorization: Bearer $LINKEDIN_ACCESS_TOKEN" \
   -H "X-Restli-Protocol-Version: 2.0.0" \
   -H "Content-Type: application/json" \

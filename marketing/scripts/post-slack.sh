@@ -31,7 +31,7 @@ text=$(sed "s|<REPO_URL>|$REPO_URL|g" "$src")
 
 payload=$(TEXT="$text" python3 -c 'import os,json;print(json.dumps({"text": os.environ["TEXT"]}))')
 
-curl -fsS -X POST "$SLACK_WEBHOOK_URL" \
+curl -fsS --max-time 60 -X POST "$SLACK_WEBHOOK_URL" \
   -H "Content-Type: application/json" \
   -d "$payload" >/dev/null
 

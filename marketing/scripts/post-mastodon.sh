@@ -30,7 +30,7 @@ fi
 
 status=$(sed "s|<REPO_URL>|$REPO_URL|g" "$src")
 
-resp=$(curl -fsS -X POST "${MASTODON_INSTANCE%/}/api/v1/statuses" \
+resp=$(curl -fsS --max-time 60 -X POST "${MASTODON_INSTANCE%/}/api/v1/statuses" \
   -H "Authorization: Bearer $MASTODON_ACCESS_TOKEN" \
   --data-urlencode "status=$status")
 

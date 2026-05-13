@@ -109,7 +109,7 @@ fi
 body=$(printf '%s' "$body" | sed "s|<REPO_URL>|$REPO_URL|g")
 
 # Step 1: OAuth token via 'password' grant against the script-app endpoint.
-token_resp=$(curl -fsS -X POST https://www.reddit.com/api/v1/access_token \
+token_resp=$(curl -fsS --max-time 60 -X POST https://www.reddit.com/api/v1/access_token \
   --user "$REDDIT_CLIENT_ID:$REDDIT_CLIENT_SECRET" \
   -A "$USER_AGENT" \
   -d "grant_type=password&username=$REDDIT_USERNAME&password=$REDDIT_PASSWORD")
@@ -123,7 +123,7 @@ if [[ -z "$access_token" ]]; then
 fi
 
 # Step 2: submit a self-text post (kind=self) to the chosen sub.
-resp=$(curl -fsS -X POST https://oauth.reddit.com/api/submit \
+resp=$(curl -fsS --max-time 60 -X POST https://oauth.reddit.com/api/submit \
   -H "Authorization: Bearer $access_token" \
   -A "$USER_AGENT" \
   --data-urlencode "sr=$REDDIT_SUBREDDIT" \

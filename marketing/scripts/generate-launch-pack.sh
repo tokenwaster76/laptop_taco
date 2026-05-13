@@ -8,14 +8,33 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/.." && pwd)"
 
 env_file="$root/launch-config.env"
-example_env="$root/launch-config.example.env"
 
+# Parse env file safely — never `source` it.  Accepts only simple
+# KEY=value lines (KEY uppercase / underscores / digits).  Optional
+# surrounding single or double quotes on the value are stripped.
+# Comment lines and blanks are ignored.  This means a maliciously
+# crafted .env file cannot execute shell code from inside this script.
+parse_env_file() {
+  local file="$1"
+  local line key value
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if [[ "$line" =~ ^[[:space:]]*([A-Z_][A-Z0-9_]*)=(.*)$ ]]; then
+      key="${BASH_REMATCH[1]}"
+      value="${BASH_REMATCH[2]}"
+      if [[ "$value" =~ ^\"(.*)\"$ ]] || [[ "$value" =~ ^\'(.*)\'$ ]]; then
+        value="${BASH_REMATCH[1]}"
+      fi
+      export "$key=$value"
+    fi
+  done < "$file"
+}
+
+# Only load the real launch-config.env. The .example.env contains
+# placeholder values like YOUR_USERNAME/laptop-taco; loading those would
+# leak the placeholder into the generated launch pack.
 if [[ -f "$env_file" ]]; then
-  # shellcheck disable=SC1090
-  source "$env_file"
-elif [[ -f "$example_env" ]]; then
-  # shellcheck disable=SC1090
-  source "$example_env"
+  parse_env_file "$env_file"
 fi
 
 REPO_URL="${REPO_URL:-https://github.com/tokenwaster76/laptop_taco}"

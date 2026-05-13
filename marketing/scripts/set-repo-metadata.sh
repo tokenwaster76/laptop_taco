@@ -41,7 +41,7 @@ api="https://api.github.com/repos/$OWNER/$REPO"
 # Description + homepage
 patch=$(DESC="$DESC" HOMEPAGE="$HOMEPAGE" python3 -c 'import os,json;print(json.dumps({"description":os.environ["DESC"],"homepage":os.environ["HOMEPAGE"]}))')
 
-curl -fsS -X PATCH "$api" \
+curl -fsS --max-time 60 -X PATCH "$api" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   -d "$patch" >/dev/null
@@ -50,7 +50,7 @@ echo "Updated description + homepage."
 # Topics
 topics_payload=$(printf '%s\n' "${topics[@]}" | python3 -c 'import sys,json;print(json.dumps({"names":[l.strip() for l in sys.stdin if l.strip()]}))')
 
-curl -fsS -X PUT "$api/topics" \
+curl -fsS --max-time 60 -X PUT "$api/topics" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   -d "$topics_payload" >/dev/null

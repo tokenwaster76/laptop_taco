@@ -50,7 +50,7 @@ print(json.dumps({"query": mutation, "variables": variables}))
 PY
 )
 
-resp=$(curl -fsS -X POST https://gql.hashnode.com \
+resp=$(curl -fsS --max-time 60 -X POST https://gql.hashnode.com \
   -H "Content-Type: application/json" \
   -H "Authorization: $HASHNODE_API_TOKEN" \
   -d "$payload")

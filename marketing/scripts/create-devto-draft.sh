@@ -51,7 +51,7 @@ print(json.dumps({"article": article}))
 PY
 )
 
-resp=$(curl -fsS -X POST https://dev.to/api/articles \
+resp=$(curl -fsS --max-time 60 -X POST https://dev.to/api/articles \
   -H "Content-Type: application/json" \
   -H "api-key: $DEVTO_API_KEY" \
   -d "$payload")

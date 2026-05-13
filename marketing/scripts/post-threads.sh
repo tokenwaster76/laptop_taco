@@ -35,7 +35,7 @@ text=$(sed "s|<REPO_URL>|$REPO_URL|g" "$src")
 api="https://graph.threads.net/v1.0/$THREADS_USER_ID"
 
 # Step 1: create the container.
-container=$(curl -fsS -X POST "$api/threads" \
+container=$(curl -fsS --max-time 60 -X POST "$api/threads" \
   --data-urlencode "media_type=TEXT" \
   --data-urlencode "text=$text" \
   --data-urlencode "access_token=$THREADS_ACCESS_TOKEN")
@@ -49,7 +49,7 @@ if [[ -z "$container_id" ]]; then
 fi
 
 # Step 2: publish.
-publish=$(curl -fsS -X POST "$api/threads_publish" \
+publish=$(curl -fsS --max-time 60 -X POST "$api/threads_publish" \
   --data-urlencode "creation_id=$container_id" \
   --data-urlencode "access_token=$THREADS_ACCESS_TOKEN")
 
