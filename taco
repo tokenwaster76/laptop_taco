@@ -136,27 +136,66 @@ fi
 start_epoch="$(date +%s)"
 start_clock="$(date +%H:%M:%S)"
 
-/bin/bash -lc "$command_str" &
-child_pid=$!
-
-/usr/bin/caffeinate -dim -w "$child_pid" &
-caffeinate_pid=$!
+child_pid=""
+caffeinate_pid=""
+child_kill_target=""
 
 cleanup_caffeinate() {
-  if kill -0 "$caffeinate_pid" 2>/dev/null; then
+  if [[ -n "${caffeinate_pid:-}" ]]; then
     kill "$caffeinate_pid" 2>/dev/null || true
+    wait "$caffeinate_pid" 2>/dev/null || true
+    caffeinate_pid=""
   fi
+}
+
+cleanup_child() {
+  local kill_target
+  if [[ -z "${child_pid:-}" ]]; then
+    return
+  fi
+  kill_target="${child_kill_target:-$child_pid}"
+  if kill -0 "$child_pid" 2>/dev/null; then
+    kill -TERM "$kill_target" 2>/dev/null || true
+    if kill -0 "$child_pid" 2>/dev/null; then
+      sleep 1
+      if kill -0 "$child_pid" 2>/dev/null; then
+        kill -KILL "$kill_target" 2>/dev/null || true
+      fi
+    fi
+  fi
+  wait "$child_pid" 2>/dev/null || true
+  child_pid=""
+  child_kill_target=""
+}
+
+cleanup_all() {
+  cleanup_child
+  cleanup_caffeinate
 }
 
 on_interrupt() {
   echo
   echo "🌮 Closing the taco. Telling the agent to stop cooking..."
-  kill -TERM "$child_pid" 2>/dev/null || true
+  cleanup_child
   cleanup_caffeinate
-  wait "$child_pid" 2>/dev/null || true
   exit 130
 }
+
 trap on_interrupt INT TERM HUP
+trap cleanup_all EXIT
+
+if [[ -x /usr/bin/setsid ]]; then
+  /usr/bin/setsid /bin/bash -lc "$command_str" &
+  child_pid=$!
+  child_kill_target="-$child_pid"
+else
+  /bin/bash -lc "$command_str" &
+  child_pid=$!
+  child_kill_target="$child_pid"
+fi
+
+/usr/bin/caffeinate -dim -w "$child_pid" &
+caffeinate_pid=$!
 
 echo "🌮 Laptop Taco engaged"
 echo
@@ -180,6 +219,7 @@ echo
 
 wait "$child_pid"
 child_exit=$?
+child_pid=""
 
 cleanup_caffeinate
 
@@ -193,7 +233,9 @@ else
   runtime="${elapsed}s"
 fi
 
-osascript -e 'display notification "Your agent finished cooking 🌮" with title "Laptop Taco"' >/dev/null 2>&1 || true
+if command -v osascript >/dev/null 2>&1; then
+  osascript -e 'display notification "Your agent finished cooking 🌮" with title "Laptop Taco"' >/dev/null 2>&1 || true
+fi
 
 echo
 if (( child_exit == 0 )); then
