@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Laptop Taco 🌮 — keep your Mac awake while your agent cooks.
 # https://github.com/tokenwaster76/laptop_taco
+# SPDX-License-Identifier: MIT
 
 set -u
 set -o pipefail
