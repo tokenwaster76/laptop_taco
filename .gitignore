@@ -2,3 +2,8 @@
 *.log
 tmp/
 .env
+
+# Marketing kit local artifacts
+marketing/dist/
+marketing/launch-config.env
+marketing/assets/social-preview.png

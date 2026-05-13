@@ -1,0 +1,27 @@
+$ ./taco claude
+
+🌮 Laptop Taco engaged
+
+Keeping your Mac awake while this runs:
+
+  claude
+
+PID: 42117
+Started: 14:32:08
+Battery: 74%
+Mode: cracked-open chaos
+
+Do not put a hot running laptop in a backpack. Seriously.
+Close the taco with Ctrl+C.
+
+[claude] reading 47 files...
+[claude] proposing 3 refactors...
+[claude] running tests...
+[claude] 142/142 passing.
+[claude] done.
+
+✅ Agent finished cooking
+Runtime: 23m 18s
+Exit code: 0
+
+You may now close the taco.
