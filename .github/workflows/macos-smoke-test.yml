@@ -93,6 +93,7 @@ jobs:
         run: |
           set +e
           log_file="$(mktemp "${TMPDIR:-/tmp}/taco-interrupt.XXXXXX.log")"
+          trap 'rm -f "$log_file"' EXIT
           ./taco "sleep 30" >"$log_file" 2>&1 &
           taco_pid=$!
           ready=0
