@@ -75,11 +75,19 @@ jobs:
 
       - name: Shell features (env + pipe + &&)
         run: |
+          set +e
           ./taco 'FOO=beans && echo "$FOO" | grep -Fx beans'
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 0
 
       - name: Embedded quotes
         run: |
+          set +e
           ./taco 'printf "%s\n" "inner \"quote\" ok" | grep -Fx "inner \"quote\" ok"'
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 0
 
       - name: Interrupt handling exits 130
         run: |
