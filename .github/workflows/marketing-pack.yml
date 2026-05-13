@@ -3,6 +3,11 @@ name: Marketing pack
 on:
   workflow_dispatch:
 
+env:
+  # Opt JavaScript actions into Node 24 now (v20 deprecated; forced switch
+  # June 2nd, 2026).
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   build:
     name: Generate launch pack artifact

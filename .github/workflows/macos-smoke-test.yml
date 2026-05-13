@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
 
+env:
+  # Opt JavaScript actions into Node 24 now (v20 is deprecated; the forced
+  # switch lands June 2nd, 2026). See:
+  # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   smoke:
     name: taco on macos-latest
