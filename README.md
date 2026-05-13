@@ -33,6 +33,8 @@
 
 ---
 
+> **What is this?** A tiny macOS command-line tool that keeps your Mac awake while a long-running terminal command finishes. Wrap any command — `claude`, `codex`, `opencode`, `npm test`, `rake spec`, a 30-minute build, an AI coding agent — and Laptop Taco inhibits sleep via Apple's built-in `caffeinate`, then sends a notification when the process exits.
+
 It is 2026. People are wandering through coffee shops clutching half-open MacBooks at exactly 45° because their AI coding agents refuse to die quietly. The lid stays cracked because closing it kills the process. The fan is screaming. The aluminum is warm enough to brand a steak. The dignity is medium-rare.
 
 I refused to participate in this lid-ajar nightmare.
@@ -69,6 +71,7 @@ Just a responsible taco.
 - Your laptop wants to sleep. Your agent wants to refactor 47 files. Taco mediates.
 - Stop walking around like a cyber goblin with a half-open laptop.
 - Caffeinate, but make it stupid.
+- Keep your Mac awake during `npm test`, `rake spec`, Xcode builds, video renders, AI coding agent refactors, batch jobs — anything that takes longer than your patience.
 - No app. No account. No cloud. Just a responsible taco.
 
 Built for Claude Code, Codex, OpenCode, Gemini CLI, Cursor agents, and suspiciously long `npm test` runs.
@@ -169,6 +172,15 @@ That's the whole tool. No daemon. No menu-bar icon. No config file. No state to 
 Honest version: raw `caffeinate -w <pid>` does the same thermal/awake job. Laptop Taco is the part above it — the argument parsing, battery readout, signal handling, notification, exit-code propagation, and one-line invocation that doesn't require you to know the PID before the process exists.
 
 ## FAQ
+
+**How do I keep my Mac awake while running a long script or test?**
+The macOS-native way is `caffeinate -dim -w <pid>`. Laptop Taco wraps that around any command you pass: `./taco "your-long-command"`. The Mac stays awake until the command exits, then you get a notification. No daemon, no GUI app, no login items.
+
+**What is `caffeinate` and why use a wrapper?**
+`caffeinate` is a built-in macOS command-line tool that inhibits system sleep. It already takes `-w <pid>` for "stay awake until process PID exits", but you have to know the PID before the process exists. Laptop Taco backgrounds your command, captures the PID, attaches `caffeinate` to it, prints status, fires a notification on finish, and passes the wrapped command's exit code back unchanged.
+
+**Does this work with Claude Code, Codex, OpenCode, Cursor, or Gemini CLI?**
+Yes — and any other CLI agent. Just `./taco <bin>` (or `./taco "<bin> --flags arg"`). The script doesn't know or care what's inside the wrapped command; it only keeps the Mac awake until that command exits.
 
 **Why macOS only?**
 Because `caffeinate` is the whole dependency, and there's no honest equivalent on Linux or Windows that does the same thing the same way. `systemd-inhibit`, `xset s off`, and `caffeine` all behave differently. Pretending one wrapper handles all three would be dishonest portability.
