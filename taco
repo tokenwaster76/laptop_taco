@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+# Laptop Taco 🌮 — keep your Mac awake while your agent cooks.
+# https://github.com/tokenwaster76/laptop_taco
+
+set -u
+set -o pipefail
+
+VERSION="0.1.0"
+
+print_help() {
+  cat <<'EOF'
+🌮 Laptop Taco — for when Claude is cooking and you need to catch a bus.
+
+USAGE
+  taco <command...>
+  taco "<quoted command with shell features>"
+  taco --help | --version
+
+EXAMPLES
+  taco claude
+  taco codex
+  taco opencode
+  taco "npm test"
+  taco "echo cooking && sleep 3 && echo done"
+
+WHAT IT DOES
+  Wraps your command in macOS caffeinate so the system stays awake
+  while it runs. Prints PID and battery. Notifies when it's done.
+  Returns the same exit code as the wrapped command.
+
+SAFETY
+  Do not put a hot running laptop in a backpack. Seriously.
+  Close the taco with Ctrl+C.
+
+macOS-only. No deps. No cloud. No account.
+EOF
+}
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  print_help
+  exit 0
+fi
+
+if [[ "${1:-}" == "--version" || "${1:-}" == "-v" ]]; then
+  echo "taco ${VERSION}"
+  exit 0
+fi
+
+if [[ "$(uname)" != "Darwin" ]]; then
+  echo "🌮 Laptop Taco is macOS-only. This taco only folds on Darwin." >&2
+  exit 1
+fi
+
+if [[ ! -x /usr/bin/caffeinate ]]; then
+  echo "🌮 /usr/bin/caffeinate not found. Is this actually macOS?" >&2
+  exit 1
+fi
+
+if [[ $# -lt 1 ]]; then
+  echo "🌮 No command given. Try: taco claude" >&2
+  echo "   See: taco --help" >&2
+  exit 1
+fi
+
+command_str="$*"
+
+battery_pct=""
+if command -v pmset >/dev/null 2>&1; then
+  raw="$(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%' | head -1 || true)"
+  raw="${raw%\%}"
+  if [[ "$raw" =~ ^[0-9]+$ ]]; then
+    battery_pct="$raw"
+  fi
+fi
+
+start_epoch="$(date +%s)"
+start_clock="$(date +%H:%M:%S)"
+
+/bin/bash -lc "$command_str" &
+child_pid=$!
+
+/usr/bin/caffeinate -dim -w "$child_pid" &
+caffeinate_pid=$!
+
+cleanup_caffeinate() {
+  if kill -0 "$caffeinate_pid" 2>/dev/null; then
+    kill "$caffeinate_pid" 2>/dev/null || true
+  fi
+}
+
+on_interrupt() {
+  echo
+  echo "🌮 Closing the taco. Telling the agent to stop cooking..."
+  kill -TERM "$child_pid" 2>/dev/null || true
+  cleanup_caffeinate
+  wait "$child_pid" 2>/dev/null || true
+  exit 130
+}
+trap on_interrupt INT TERM
+
+echo "🌮 Laptop Taco engaged"
+echo
+echo "Keeping your Mac awake while this runs:"
+echo
+echo "  ${command_str}"
+echo
+echo "PID: ${child_pid}"
+echo "Started: ${start_clock}"
+if [[ -n "$battery_pct" ]]; then
+  echo "Battery: ${battery_pct}%"
+  if (( battery_pct < 20 )); then
+    echo "🌮 Taco warning: battery below 20%. Plug in or your agent may die mid-refactor."
+  fi
+fi
+echo "Mode: cracked-open chaos"
+echo
+echo "Do not put a hot running laptop in a backpack. Seriously."
+echo "Close the taco with Ctrl+C."
+echo
+
+wait "$child_pid"
+child_exit=$?
+
+cleanup_caffeinate
+
+end_epoch="$(date +%s)"
+elapsed=$(( end_epoch - start_epoch ))
+if (( elapsed >= 60 )); then
+  runtime="$(( elapsed / 60 ))m $(( elapsed % 60 ))s"
+else
+  runtime="${elapsed}s"
+fi
+
+osascript -e 'display notification "Your agent finished cooking 🌮" with title "Laptop Taco"' >/dev/null 2>&1 || true
+
+echo
+if (( child_exit == 0 )); then
+  echo "✅ Agent finished cooking"
+else
+  echo "🌮 Agent stopped cooking (non-zero exit)"
+fi
+echo "Runtime: ${runtime}"
+echo "Exit code: ${child_exit}"
+echo
+echo "You may now close the taco."
+
+exit "$child_exit"

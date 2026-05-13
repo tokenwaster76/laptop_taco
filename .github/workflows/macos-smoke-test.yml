@@ -1,0 +1,55 @@
+name: macOS smoke test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    name: taco on macos-latest
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print macOS version
+        run: |
+          sw_vers
+          uname -a
+
+      - name: Verify required macOS tools
+        run: |
+          command -v caffeinate
+          command -v pmset
+          command -v osascript
+
+      - name: Make taco executable
+        run: chmod +x ./taco
+
+      - name: Syntax check
+        run: bash -n ./taco
+
+      - name: taco --help
+        run: ./taco --help
+
+      - name: taco --version
+        run: |
+          out="$(./taco --version)"
+          echo "$out"
+          test "$out" = "taco 0.1.0"
+
+      - name: Happy path
+        run: ./taco "echo cooking && sleep 1 && echo done"
+
+      - name: Exit code propagation
+        run: |
+          set +e
+          ./taco "exit 42"
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 42
+
+      # v0.1.0: the Ctrl+C trap is verified manually. CI does not give us a
+      # reliable TTY to deliver SIGINT to the foreground process group the way
+      # a terminal does, so a script-based test would be flaky. Revisit when
+      # we add `script`/`expect` harness support.
