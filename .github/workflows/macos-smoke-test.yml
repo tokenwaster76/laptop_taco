@@ -44,6 +44,9 @@ jobs:
       - name: taco --version
         run: ./taco --version
 
+      - name: taco doctor
+        run: ./taco doctor
+
       - name: Happy path
         run: ./taco "echo cooking && sleep 1 && echo done"
 
@@ -54,3 +57,60 @@ jobs:
           code=$?
           echo "Exit code: $code"
           test "$code" -eq 42
+
+      - name: Exit code propagation (127 for missing inner command)
+        run: |
+          set +e
+          ./taco "__taco_missing_inner_cmd_127__"
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 127
+
+      - name: Missing command guard (no args)
+        run: |
+          set +e
+          output="$(./taco 2>&1)"
+          code=$?
+          echo "$output"
+          test "$code" -eq 1
+          echo "$output" | grep -F "No command given. Try: taco claude"
+          echo "$output" | grep -F "See: taco --help"
+
+      - name: Shell features (env + pipe + &&)
+        run: |
+          set +e
+          ./taco 'FOO=beans && echo "$FOO" | grep -Fx beans'
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 0
+
+      - name: Embedded quotes
+        run: |
+          set +e
+          ./taco 'printf "%s\n" "inner \"quote\" ok" | grep -Fx "inner \"quote\" ok"'
+          code=$?
+          echo "Exit code: $code"
+          test "$code" -eq 0
+
+      - name: Interrupt handling exits 130
+        run: |
+          set +e
+          log_file="$(mktemp "${TMPDIR:-/tmp}/taco-interrupt.XXXXXXXXXXXX.log")"
+          trap 'rm -f "$log_file"' EXIT
+          ./taco "sleep 30" >"$log_file" 2>&1 &
+          taco_pid=$!
+          ready=0
+          for i in 1 2 3 4 5; do
+            if kill -0 "$taco_pid" 2>/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" -eq 1
+          kill -INT "$taco_pid"
+          wait "$taco_pid"
+          code=$?
+          echo "Exit code: $code"
+          tail -n 40 "$log_file"
+          test "$code" -eq 130
