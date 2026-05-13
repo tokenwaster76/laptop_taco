@@ -92,12 +92,18 @@ jobs:
       - name: Interrupt handling exits 130
         run: |
           set +e
-          ./taco "sleep 30" >/tmp/taco-interrupt.log 2>&1 &
+          log_file="$(mktemp "${TMPDIR:-/tmp}/taco-interrupt.XXXXXX.log")"
+          ./taco "sleep 30" >"$log_file" 2>&1 &
           taco_pid=$!
-          sleep 2
+          for _ in 1 2 3 4 5; do
+            if kill -0 "$taco_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
           kill -INT "$taco_pid"
           wait "$taco_pid"
           code=$?
           echo "Exit code: $code"
-          tail -n 40 /tmp/taco-interrupt.log
+          tail -n 40 "$log_file"
           test "$code" -eq 130
