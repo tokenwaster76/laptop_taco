@@ -103,6 +103,8 @@ Exit code is whatever your command returned. `./taco "exit 42"` exits 42.
 
 ## Demo
 
+![Laptop Taco terminal demo](marketing/assets/terminal-screenshot.svg)
+
 ```
 🌮 Laptop Taco engaged
 
