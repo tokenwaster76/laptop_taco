@@ -4,10 +4,6 @@ description: A tiny macOS CLI for the new ritual of waiting on AI coding agents.
 layout: default
 ---
 
-<p align="center">
-  <img src="../marketing/assets/terminal-screenshot.svg" alt="Laptop Taco terminal demo" width="720">
-</p>
-
 # Laptop Taco 🌮
 
 **For when your agent is cooking and you need to catch a bus.**
@@ -66,13 +62,3 @@ Do not put a hot running laptop in a backpack. Vents matter. Thermal throttling 
 - **Release notes:** [latest release](https://github.com/tokenwaster76/laptop_taco/releases/latest)
 - **Issues:** [github.com/tokenwaster76/laptop_taco/issues](https://github.com/tokenwaster76/laptop_taco/issues)
 - **License:** MIT
-
-## Share
-
-> People are walking around with half-open laptops so AI coding agents do not fall asleep mid-task.
->
-> So I made Laptop Taco 🌮
->
-> No app. No account. No cloud. Just a responsible taco.
->
-> [github.com/tokenwaster76/laptop_taco](https://github.com/tokenwaster76/laptop_taco)
