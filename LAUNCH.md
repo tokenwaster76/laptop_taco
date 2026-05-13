@@ -40,7 +40,25 @@ gh repo list tokenwaster76 --visibility public --limit 200 \
 
 That command **excludes** `laptop_taco`. Read the list before piping if you have any repo you want to keep public other than laptop_taco.
 
-### 4. Profile README (renders on your profile page)
+### 4. Profile avatar (taco, matching the repo's visual language)
+
+`marketing/assets/profile-avatar.svg` — 1024×1024 vector, dark canvas + amber ring + a flat-illustrated taco. No emoji-font dependency, so PNG conversion looks the same on any machine.
+
+```bash
+# librsvg
+rsvg-convert -w 1024 -h 1024 marketing/assets/profile-avatar.svg \
+  -o /tmp/avatar.png
+
+# or Inkscape
+inkscape marketing/assets/profile-avatar.svg \
+  --export-type=png --export-filename=/tmp/avatar.png -w 1024 -h 1024
+```
+
+Upload at https://github.com/settings/profile → *Profile picture → Edit → Upload a photo* → pick `/tmp/avatar.png`.
+
+GitHub crops to square automatically, but the SVG is already square so no cropping happens.
+
+### 5. Profile README (renders on your profile page)
 
 1. https://github.com/new
 2. Repository name: `tokenwaster76` (exactly your username)
